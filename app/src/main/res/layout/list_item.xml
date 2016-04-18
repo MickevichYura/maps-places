@@ -12,6 +12,7 @@
 
         <TextView
             android:id="@+id/text1"
+            android:textColor="@color/textColor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="This is Title"
@@ -19,6 +20,7 @@
 
         <TextView
             android:id="@+id/text2"
+            android:textColor="@color/textColor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="This is Description" />
