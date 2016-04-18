@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
             String titleItem = itemHashMap.get(TITLE).toString();
             String descriptionItem = itemHashMap.get(DESCRIPTION).toString();
             Toast.makeText(getBaseContext(),
-                    "Вы выбрали " + titleItem + ". " + descriptionItem, Toast.LENGTH_SHORT).show();
+                    titleItem + "\n" + descriptionItem, Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                 hm.put(ICON, R.drawable.mr_ic_cast_light); // Картинка
                 mPlacesList.add(hm);
             }
-            SimpleAdapter adapter = new SimpleAdapter(getContext(), mPlacesList,
+            SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), mPlacesList,
                     R.layout.list_item, new String[]{TITLE, DESCRIPTION, ICON},
                     new int[]{R.id.text1, R.id.text2, R.id.img});
 
@@ -173,10 +173,6 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private Context getContext() {
-        return this;
-    }
-
     private ArrayList<HashMap<String, Object>> mPlacesList;
     private static final String TITLE = "title"; // Верхний текст
     private static final String DESCRIPTION = "description"; // ниже главного
@@ -196,7 +192,6 @@ public class MainActivity extends AppCompatActivity {
                         MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
             }
         } else {
-
 
             PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
                     .getCurrentPlace(mGoogleApiClient, null);
