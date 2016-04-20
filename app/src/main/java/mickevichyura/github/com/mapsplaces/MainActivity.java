@@ -1,25 +1,25 @@
 package mickevichyura.github.com.mapsplaces;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -33,16 +33,22 @@ import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.Places;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    public List<Place> places;
 
     private GoogleApiClient mGoogleApiClient;
 
-    private ListView listPlaces;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerView.ItemAnimator itemAnimator;
 
     private ImageView mImageView;
+
+    private List<Drawable> bitmap;
 
     static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
 
@@ -61,7 +67,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        listPlaces = (ListView) findViewById(R.id.listPlaces);
+        mRecyclerView = (RecyclerView) findViewById(R.id.listPlaces);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        itemAnimator = new DefaultItemAnimator();
+        mRecyclerView.setItemAnimator(itemAnimator);
+
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
                 .addApi(Places.GEO_DATA_API)
@@ -69,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         requestPermission();
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -79,17 +92,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-    AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            HashMap<String, Object> itemHashMap = (HashMap<String, Object>) parent.getItemAtPosition(position);
-            String titleItem = itemHashMap.get(TITLE).toString();
-            String descriptionItem = itemHashMap.get(DESCRIPTION).toString();
-            Toast.makeText(getBaseContext(),
-                    titleItem + "\n" + descriptionItem, Toast.LENGTH_SHORT).show();
-        }
-    };
 
     @Override
     protected void onStart() {
@@ -116,25 +118,20 @@ public class MainActivity extends AppCompatActivity {
     ResultCallback<PlaceLikelihoodBuffer> cb = new ResultCallback<PlaceLikelihoodBuffer>() {
         @Override
         public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
-            mPlacesList = new ArrayList<HashMap<String, Object>>();
-            HashMap<String, Object> hm;
+            places = new ArrayList<>();
+            bitmap = new ArrayList<>();
+            for (PlaceLikelihood placeLikelihood : likelyPlaces)
+                placePhotosAsync(placeLikelihood.getPlace().getId());
 
             for (PlaceLikelihood placeLikelihood : likelyPlaces) {
-                hm = new HashMap<>();
-                hm.put(TITLE, placeLikelihood.getPlace().getName()); // Название
 
-                placePhotosAsync(placeLikelihood.getPlace().getId());
-                hm.put(DESCRIPTION, placeLikelihood.getPlace().getAddress()); // Описание
-                hm.put(ICON, R.drawable.mr_ic_cast_light); // Картинка
-                mPlacesList.add(hm);
+                places.add(new Place(placeLikelihood.getPlace().getName().toString(),
+                placeLikelihood.getPlace().getAddress().toString(), getDrawable(R.drawable.common_google_signin_btn_icon_light)));
+
             }
-            SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), mPlacesList,
-                    R.layout.list_item, new String[]{TITLE, DESCRIPTION, ICON},
-                    new int[]{R.id.text1, R.id.text2, R.id.img});
 
-            listPlaces.setAdapter(adapter);
-            listPlaces.setOnItemClickListener(itemClickListener);
-
+            mAdapter = new RecyclerViewAdapter(places);
+            mRecyclerView.setAdapter(mAdapter);
             likelyPlaces.release();
         }
     };
@@ -144,10 +141,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onResult(PlacePhotoResult placePhotoResult) {
             if (!placePhotoResult.getStatus().isSuccess()) {
-
+                bitmap.add(getDrawable(R.drawable.cast_ic_notification_0));
                 return;
             }
-            mImageView.setImageBitmap(placePhotoResult.getBitmap());
+
+            //mImageView.setImageBitmap(placePhotoResult.getBitmap());
+            bitmap.add(mImageView.getDrawable());
         }
     };
 
@@ -158,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResult(PlacePhotoMetadataResult photos) {
                         if (!photos.getStatus().isSuccess()) {
+                            bitmap.add(getDrawable(R.drawable.cast_ic_notification_0));
                             return;
                         }
 
@@ -168,15 +168,11 @@ public class MainActivity extends AppCompatActivity {
                                             mImageView.getHeight())
                                     .setResultCallback(mDisplayPhotoResultCallback);
                         }
+
                         photoMetadataBuffer.release();
                     }
                 });
     }
-
-    private ArrayList<HashMap<String, Object>> mPlacesList;
-    private static final String TITLE = "title"; // Верхний текст
-    private static final String DESCRIPTION = "description"; // ниже главного
-    private static final String ICON = "icon";  // будущая картинка
 
     private void requestPermission() {
         if (ContextCompat.checkSelfPermission(this,
@@ -201,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           @NonNull String permissions[], int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 if (grantResults.length > 0
