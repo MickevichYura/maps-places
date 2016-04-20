@@ -1,4 +1,4 @@
-package mickevichyura.github.com.mapsplaces;
+package mickevichyura.github.com.mapsplaces.Activity;
 
 import android.Manifest;
 import android.content.Intent;
@@ -19,7 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -34,6 +34,12 @@ import com.google.android.gms.location.places.Places;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
+import mickevichyura.github.com.mapsplaces.Adapter.OnItemClickListener;
+import mickevichyura.github.com.mapsplaces.Adapter.RecyclerViewAdapter;
+import mickevichyura.github.com.mapsplaces.Place;
+import mickevichyura.github.com.mapsplaces.R;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -120,17 +126,21 @@ public class MainActivity extends AppCompatActivity {
         public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
             places = new ArrayList<>();
             bitmap = new ArrayList<>();
-            for (PlaceLikelihood placeLikelihood : likelyPlaces)
-                placePhotosAsync(placeLikelihood.getPlace().getId());
 
             for (PlaceLikelihood placeLikelihood : likelyPlaces) {
 
                 places.add(new Place(placeLikelihood.getPlace().getName().toString(),
-                placeLikelihood.getPlace().getAddress().toString(), getDrawable(R.drawable.common_google_signin_btn_icon_light)));
+                        placeLikelihood.getPlace().getAddress().toString(), getDrawable(R.drawable.common_google_signin_btn_icon_light), placeLikelihood.getPlace().getId()));
 
             }
 
-            mAdapter = new RecyclerViewAdapter(places);
+            mAdapter = new RecyclerViewAdapter(places, new OnItemClickListener() {
+                @Override
+                public void onItemClick(Place place) {
+                    placePhotosAsync(place.getId());
+                    Toast.makeText(getBaseContext(), place.getAddress(), Toast.LENGTH_LONG).show();
+                }
+            });
             mRecyclerView.setAdapter(mAdapter);
             likelyPlaces.release();
         }
@@ -145,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            //mImageView.setImageBitmap(placePhotoResult.getBitmap());
+            mImageView.setImageBitmap(placePhotoResult.getBitmap());
             bitmap.add(mImageView.getDrawable());
         }
     };
@@ -163,7 +173,8 @@ public class MainActivity extends AppCompatActivity {
 
                         PlacePhotoMetadataBuffer photoMetadataBuffer = photos.getPhotoMetadata();
                         if (photoMetadataBuffer.getCount() > 0) {
-                            photoMetadataBuffer.get(0)
+                            int position = new Random(100).nextInt(photoMetadataBuffer.getCount());
+                            photoMetadataBuffer.get(position)
                                     .getScaledPhoto(mGoogleApiClient, mImageView.getWidth(),
                                             mImageView.getHeight())
                                     .setResultCallback(mDisplayPhotoResultCallback);
@@ -205,10 +216,10 @@ public class MainActivity extends AppCompatActivity {
 
                 } else {
 
-                    TextView tv = (TextView) findViewById(R.id.tv);
-                    if (tv != null) {
-                        tv.setText("NO");
-                    }
+//                    TextView tv = (TextView) findViewById(R.id.tv);
+//                    if (tv != null) {
+//                        tv.setText("NO");
+//                    }
                 }
                 return;
             }
