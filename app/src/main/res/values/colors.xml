@@ -2,7 +2,9 @@
 <resources>
     <color name="colorPrimary">#010a3e</color>
     <color name="colorPrimaryDark">#040c39</color>
-    <color name="colorAccent">#dd1010</color>
+    <color name="colorAccent">#d41010</color>
+    <color name="rippleColorAccent">#232e6e</color>
     <color name="navigationBarColor">#040c39</color>
     <color name="textColor">#000000</color>
+    <color name="cardBackgroundColor">#e0e0e0</color>
 </resources>

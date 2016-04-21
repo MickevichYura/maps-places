@@ -24,6 +24,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         PlaceViewHolder(View itemView) {
             super(itemView);
             itemView.setClickable(true);
+            itemView.setLongClickable(true);
             cv = (CardView) itemView.findViewById(R.id.cardView);
             placeName = (TextView) itemView.findViewById(R.id.place_name);
             placeAddress = (TextView) itemView.findViewById(R.id.place_address);
