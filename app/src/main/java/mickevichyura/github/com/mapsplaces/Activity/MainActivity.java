@@ -3,7 +3,6 @@ package mickevichyura.github.com.mapsplaces.Activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -18,7 +17,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.AccountPicker;
@@ -27,14 +25,10 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
-import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
-import com.google.android.gms.location.places.PlacePhotoMetadataResult;
-import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.Places;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import mickevichyura.github.com.mapsplaces.Adapter.OnItemClickListener;
 import mickevichyura.github.com.mapsplaces.Adapter.RecyclerViewAdapter;
@@ -45,16 +39,12 @@ public class MainActivity extends AppCompatActivity {
 
     public List<Place> places;
 
-    private GoogleApiClient mGoogleApiClient;
+    public static GoogleApiClient mGoogleApiClient;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.ItemAnimator itemAnimator;
-
-    private ImageView mImageView;
-
-    private List<Drawable> bitmap;
 
     static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
 
@@ -90,13 +80,15 @@ public class MainActivity extends AppCompatActivity {
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Add new place action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        if (fab != null) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Snackbar.make(view, "Add new place action", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+            });
+        }
     }
 
     @Override
@@ -123,67 +115,30 @@ public class MainActivity extends AppCompatActivity {
 
     ResultCallback<PlaceLikelihoodBuffer> cb = new ResultCallback<PlaceLikelihoodBuffer>() {
         @Override
-        public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
+        public void onResult(final PlaceLikelihoodBuffer likelyPlaces) {
             places = new ArrayList<>();
-            bitmap = new ArrayList<>();
 
             for (PlaceLikelihood placeLikelihood : likelyPlaces) {
 
                 places.add(new Place(placeLikelihood.getPlace().getName().toString(),
-                        placeLikelihood.getPlace().getAddress().toString(), getDrawable(R.drawable.common_google_signin_btn_icon_light), placeLikelihood.getPlace().getId()));
+                        placeLikelihood.getPlace().getAddress().toString(), placeLikelihood.getPlace().getId()));
 
             }
 
             mAdapter = new RecyclerViewAdapter(places, new OnItemClickListener() {
                 @Override
                 public void onItemClick(Place place) {
-                    placePhotosAsync(place.getId());
                     Toast.makeText(getBaseContext(), place.getAddress(), Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(getBaseContext(), PlaceActivity.class);
+
+                    intent.putExtra("place", place);
+                    startActivity(intent);
                 }
             });
             mRecyclerView.setAdapter(mAdapter);
             likelyPlaces.release();
         }
     };
-
-    private ResultCallback<PlacePhotoResult> mDisplayPhotoResultCallback
-            = new ResultCallback<PlacePhotoResult>() {
-        @Override
-        public void onResult(PlacePhotoResult placePhotoResult) {
-            if (!placePhotoResult.getStatus().isSuccess()) {
-                bitmap.add(getDrawable(R.drawable.cast_ic_notification_0));
-                return;
-            }
-
-            mImageView.setImageBitmap(placePhotoResult.getBitmap());
-            bitmap.add(mImageView.getDrawable());
-        }
-    };
-
-    private void placePhotosAsync(String placeId) {
-        mImageView = (ImageView) findViewById(R.id.mImageView);
-        Places.GeoDataApi.getPlacePhotos(mGoogleApiClient, placeId)
-                .setResultCallback(new ResultCallback<PlacePhotoMetadataResult>() {
-                    @Override
-                    public void onResult(PlacePhotoMetadataResult photos) {
-                        if (!photos.getStatus().isSuccess()) {
-                            bitmap.add(getDrawable(R.drawable.cast_ic_notification_0));
-                            return;
-                        }
-
-                        PlacePhotoMetadataBuffer photoMetadataBuffer = photos.getPhotoMetadata();
-                        if (photoMetadataBuffer.getCount() > 0) {
-                            int position = new Random(100).nextInt(photoMetadataBuffer.getCount());
-                            photoMetadataBuffer.get(position)
-                                    .getScaledPhoto(mGoogleApiClient, mImageView.getWidth(),
-                                            mImageView.getHeight())
-                                    .setResultCallback(mDisplayPhotoResultCallback);
-                        }
-
-                        photoMetadataBuffer.release();
-                    }
-                });
-    }
 
     private void requestPermission() {
         if (ContextCompat.checkSelfPermission(this,
@@ -216,10 +171,6 @@ public class MainActivity extends AppCompatActivity {
 
                 } else {
 
-//                    TextView tv = (TextView) findViewById(R.id.tv);
-//                    if (tv != null) {
-//                        tv.setText("NO");
-//                    }
                 }
                 return;
             }

@@ -1,16 +1,14 @@
 package mickevichyura.github.com.mapsplaces;
 
-import android.graphics.drawable.Drawable;
+import java.io.Serializable;
 
-public class Place {
+public class Place implements Serializable {
 
     private String id;
 
     private String name;
 
     private String address;
-
-    private Drawable photoDrawable;
 
     public String getId() {
         return id;
@@ -24,15 +22,9 @@ public class Place {
         return address;
     }
 
-    public Drawable getPhotoDrawable() {
-        return photoDrawable;
-    }
-
-
-    public Place(String name, String age, Drawable photoDrawable, String id) {
+    public Place(String name, String address, String id) {
         this.name = name;
-        this.address = age;
-        this.photoDrawable = photoDrawable;
+        this.address = address;
         this.id = id;
 
     }

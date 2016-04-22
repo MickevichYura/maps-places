@@ -51,7 +51,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         this.listener = listener;
     }
 
-    RecyclerViewAdapter(List<Place> places) {
+    public RecyclerViewAdapter(List<Place> places) {
         this.places = places;
     }
 
@@ -66,7 +66,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(PlaceViewHolder holder, int position) {
         holder.placeName.setText(places.get(position).getName());
         holder.placeAddress.setText(places.get(position).getAddress());
-        holder.placePhoto.setImageDrawable(places.get(position).getPhotoDrawable());
+        holder.placePhoto.setImageResource((R.drawable.common_google_signin_btn_icon_light));
         holder.bind(places.get(position), listener);
     }
 
