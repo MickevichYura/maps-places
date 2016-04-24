@@ -7,4 +7,5 @@
     <color name="navigationBarColor">#040c39</color>
     <color name="textColor">#000000</color>
     <color name="cardBackgroundColor">#e0e0e0</color>
+    <color name="photoCardBackgroundColor">#425bfa</color>
 </resources>

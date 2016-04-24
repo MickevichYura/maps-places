@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import mickevichyura.github.com.mapsplaces.Place;
+import mickevichyura.github.com.mapsplaces.PlaceObject;
 import mickevichyura.github.com.mapsplaces.R;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.PlaceViewHolder> {
@@ -31,7 +31,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             placePhoto = (ImageView) itemView.findViewById(R.id.place_photo);
         }
 
-        public void bind(final Place place, final OnItemClickListener listener) {
+        public void bind(final PlaceObject place, final OnItemClickListener listener) {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -42,22 +42,22 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     }
 
-    public List<Place> places;
+    public List<PlaceObject> places;
 
     private OnItemClickListener listener;
 
-    public RecyclerViewAdapter(List<Place> places, OnItemClickListener listener) {
+    public RecyclerViewAdapter(List<PlaceObject> places, OnItemClickListener listener) {
         this.places = places;
         this.listener = listener;
     }
 
-    public RecyclerViewAdapter(List<Place> places) {
+    public RecyclerViewAdapter(List<PlaceObject> places) {
         this.places = places;
     }
 
     @Override
     public PlaceViewHolder onCreateViewHolder(ViewGroup parent, int i) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.card, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.place_card_item, parent, false);
         PlaceViewHolder pvh = new PlaceViewHolder(v);
         return pvh;
     }

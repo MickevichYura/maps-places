@@ -17,7 +17,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -32,12 +31,12 @@ import java.util.List;
 
 import mickevichyura.github.com.mapsplaces.Adapter.OnItemClickListener;
 import mickevichyura.github.com.mapsplaces.Adapter.RecyclerViewAdapter;
-import mickevichyura.github.com.mapsplaces.Place;
+import mickevichyura.github.com.mapsplaces.PlaceObject;
 import mickevichyura.github.com.mapsplaces.R;
 
 public class MainActivity extends AppCompatActivity {
 
-    public List<Place> places;
+    public List<PlaceObject> places;
 
     public static GoogleApiClient mGoogleApiClient;
 
@@ -78,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
 
         requestPermission();
 
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         if (fab != null) {
             fab.setOnClickListener(new View.OnClickListener() {
@@ -99,8 +97,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        mGoogleApiClient.disconnect();
         super.onStop();
+        mGoogleApiClient.disconnect();
     }
 
     @Override
@@ -120,15 +118,13 @@ public class MainActivity extends AppCompatActivity {
 
             for (PlaceLikelihood placeLikelihood : likelyPlaces) {
 
-                places.add(new Place(placeLikelihood.getPlace().getName().toString(),
-                        placeLikelihood.getPlace().getAddress().toString(), placeLikelihood.getPlace().getId()));
+                places.add(new PlaceObject(placeLikelihood.getPlace()));
 
             }
 
             mAdapter = new RecyclerViewAdapter(places, new OnItemClickListener() {
                 @Override
-                public void onItemClick(Place place) {
-                    Toast.makeText(getBaseContext(), place.getAddress(), Toast.LENGTH_LONG).show();
+                public void onItemClick(PlaceObject place) {
                     Intent intent = new Intent(getBaseContext(), PlaceActivity.class);
 
                     intent.putExtra("place", place);

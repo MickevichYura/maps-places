@@ -12,10 +12,38 @@
     tools:context=".Activity.PlaceActivity"
     tools:showIn="@layout/activity_place">
 
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dp" />
 
-    <ImageView
-        android:id="@+id/mImageView"
+    <TextView
+        android:id="@+id/tv_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_name"
+        android:padding="3dp" />
+
+    <TextView
+        android:id="@+id/tv_website_uri"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_address"
+        android:padding="3dp" />
+
+    <TextView
+        android:id="@+id/tv_phone_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_website_uri"
+        android:padding="3dp" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_below="@id/tv_phone_number"
+        android:scrollbars="vertical" />
 
 </RelativeLayout>
