@@ -57,7 +57,7 @@ public class PlaceActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         place = (PlaceObject) intent.getSerializableExtra("place");
-        if (toolbar != null) {
+        if (place != null) {
             toolbar.setTitle(place.getName());
         }
         setSupportActionBar(toolbar);
@@ -113,8 +113,10 @@ public class PlaceActivity extends AppCompatActivity {
             }
 
             mListPhotos.add(placePhotoResult.getBitmap());
-            if (mListPhotos.size() > 0)
+            if (mListPhotos.size() > 0){
                 photoObjectList.get(mListPhotos.size() - 1).setPhoto(placePhotoResult.getBitmap());
+            }
+
             photoCardAdapter.notifyDataSetChanged();
         }
     };
@@ -135,7 +137,6 @@ public class PlaceActivity extends AppCompatActivity {
                                 author = String.format(getResources().getString(R.string.photo_card_author), Html.fromHtml(placePhotoMetadata.getAttributions().toString()).toString());
                                 mListPhotosAuthors.add(author);
                                 placePhotoMetadata.getScaledPhoto(mGoogleApiClient, 640, 640).setResultCallback(mDisplayPhotoResultCallback,
-//                                placePhotoMetadata.getPhoto(mGoogleApiClient).setResultCallback(mDisplayPhotoResultCallback,
                                         1000, TimeUnit.SECONDS);
                             }
                         } else {
@@ -151,7 +152,7 @@ public class PlaceActivity extends AppCompatActivity {
                     }
                 }, 5, TimeUnit.MINUTES);
 
-
+        photoCardAdapter.notifyDataSetChanged();
     }
 
     @Override

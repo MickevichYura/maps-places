@@ -40,10 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static GoogleApiClient mGoogleApiClient;
 
-    private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private RecyclerView.ItemAnimator itemAnimator;
 
     static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
 
@@ -62,12 +59,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        mRecyclerView = (RecyclerView) findViewById(R.id.listPlaces);
-        mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        itemAnimator = new DefaultItemAnimator();
-        mRecyclerView.setItemAnimator(itemAnimator);
+
+        places = new ArrayList<>();
+
+        setAdapter();
 
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
@@ -87,6 +82,24 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void setAdapter() {
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.listPlaces);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
+        mRecyclerView.setItemAnimator(itemAnimator);
+        mAdapter = new RecyclerViewAdapter(places, new OnItemClickListener() {
+            @Override
+            public void onItemClick(PlaceObject place) {
+                Intent intent = new Intent(getBaseContext(), PlaceActivity.class);
+
+                intent.putExtra("place", place);
+                startActivity(intent);
+            }
+        });
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     @Override
@@ -114,24 +127,11 @@ public class MainActivity extends AppCompatActivity {
     ResultCallback<PlaceLikelihoodBuffer> cb = new ResultCallback<PlaceLikelihoodBuffer>() {
         @Override
         public void onResult(final PlaceLikelihoodBuffer likelyPlaces) {
-            places = new ArrayList<>();
 
             for (PlaceLikelihood placeLikelihood : likelyPlaces) {
-
                 places.add(new PlaceObject(placeLikelihood.getPlace()));
-
             }
-
-            mAdapter = new RecyclerViewAdapter(places, new OnItemClickListener() {
-                @Override
-                public void onItemClick(PlaceObject place) {
-                    Intent intent = new Intent(getBaseContext(), PlaceActivity.class);
-
-                    intent.putExtra("place", place);
-                    startActivity(intent);
-                }
-            });
-            mRecyclerView.setAdapter(mAdapter);
+            mAdapter.notifyDataSetChanged();
             likelyPlaces.release();
         }
     };
