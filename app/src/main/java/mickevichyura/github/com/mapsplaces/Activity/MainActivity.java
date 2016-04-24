@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -70,19 +71,21 @@ public class MainActivity extends AppCompatActivity {
                 .addApi(Places.PLACE_DETECTION_API)
                 .build();
 
-        requestPermission();
+        findNearPlaces();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         if (fab != null) {
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Snackbar.make(view, "Add new place action", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                }
-            });
+            fab.setOnClickListener(fabOnClickListener);
         }
     }
+
+    FloatingActionButton.OnClickListener fabOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Snackbar.make(view, "Add new place action", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }
+    };
 
     private void setAdapter() {
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.listPlaces);
@@ -122,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        checkPermissions();
     }
 
     ResultCallback<PlaceLikelihoodBuffer> cb = new ResultCallback<PlaceLikelihoodBuffer>() {
@@ -136,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private void requestPermission() {
+    private void checkPermissions() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -148,9 +152,19 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+                return;
             }
         } else {
+            findNearPlaces();
+        }
+    }
 
+    private void findNearPlaces() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        } else {
             PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
                     .getCurrentPlace(mGoogleApiClient, null);
             result.setResultCallback(cb);
@@ -164,12 +178,14 @@ public class MainActivity extends AppCompatActivity {
             case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+                    findNearPlaces();
                 } else {
-
+                    Toast.makeText(MainActivity.this, "Permission denied", Toast.LENGTH_SHORT).show();
                 }
-                return;
             }
+            break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
