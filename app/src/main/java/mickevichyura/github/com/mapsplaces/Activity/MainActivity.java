@@ -19,13 +19,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.common.AccountPicker;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlacePicker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,18 +44,10 @@ public class MainActivity extends AppCompatActivity {
 
     public static GoogleApiClient mGoogleApiClient;
 
+    RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
 
-    static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
-
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-
-    private void pickUserAccount() {
-        String[] accountTypes = new String[]{"com.google"};
-        Intent intent = AccountPicker.newChooseAccountIntent(null, null,
-                accountTypes, false, null, null, null, null);
-        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private void setAdapter() {
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.listPlaces);
+        mRecyclerView = (RecyclerView) findViewById(R.id.listPlaces);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
         RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
@@ -113,8 +108,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        super.onStop();
         mGoogleApiClient.disconnect();
+        super.onStop();
     }
 
     @Override
@@ -125,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        checkPermissions();
     }
 
     ResultCallback<PlaceLikelihoodBuffer> cb = new ResultCallback<PlaceLikelihoodBuffer>() {
@@ -134,8 +128,9 @@ public class MainActivity extends AppCompatActivity {
 
             for (PlaceLikelihood placeLikelihood : likelyPlaces) {
                 places.add(new PlaceObject(placeLikelihood.getPlace()));
+                mAdapter.notifyItemInserted(places.size() - 1);
             }
-            mAdapter.notifyDataSetChanged();
+
             likelyPlaces.release();
         }
     };
@@ -165,9 +160,26 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         } else {
-            PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
-                    .getCurrentPlace(mGoogleApiClient, null);
-            result.setResultCallback(cb);
+            if (places.isEmpty()) {
+                PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
+                        .getCurrentPlace(mGoogleApiClient, null);
+                result.setResultCallback(cb);
+            }
+
+
+        }
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(this, data);
+                PlaceObject placeObject = new PlaceObject(place);
+                Intent intent = new Intent(getBaseContext(), PlaceActivity.class);
+
+                intent.putExtra("place", placeObject);
+                startActivity(intent);
+            }
         }
     }
 
@@ -198,15 +210,31 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_update) {
+            Intent intent = getIntent();
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            finish();
+            startActivity(intent);
             return true;
         }
+
+        if (id == R.id.action_place_picker) {
+            int PLACE_PICKER_REQUEST = 1;
+            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+            try {
+                startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+            } catch (GooglePlayServicesRepairableException e) {
+                e.printStackTrace();
+            } catch (GooglePlayServicesNotAvailableException e) {
+                e.printStackTrace();
+                Toast.makeText(MainActivity.this, "Google play service are not available", Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        }
+
 
         return super.onOptionsItemSelected(item);
     }

@@ -2,6 +2,7 @@ package mickevichyura.github.com.mapsplaces.Activity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -73,6 +74,11 @@ public class PlaceActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     Snackbar.make(view, "Edit place action", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
+
+                    Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + place.getName() + " " + place.getAddress());
+                    Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                    mapIntent.setPackage("com.google.android.apps.maps");
+                    startActivity(mapIntent);
                 }
             });
         }
