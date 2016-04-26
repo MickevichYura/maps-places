@@ -70,7 +70,7 @@ public class NewPlaceActivity extends AppCompatActivity {
                     e.printStackTrace();
                 } catch (GooglePlayServicesNotAvailableException e) {
                     e.printStackTrace();
-                    Toast.makeText(NewPlaceActivity.this, "Google play service are not available", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(NewPlaceActivity.this, R.string.gps_not_available, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -84,7 +84,7 @@ public class NewPlaceActivity extends AppCompatActivity {
                 public void onClick(View view) {
 
                     if (!isDataValid()) {
-                        Snackbar.make(view, "Wrong data", Snackbar.LENGTH_LONG)
+                        Snackbar.make(view, R.string.invalid_data, Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     } else {
                         AddPlaceRequest place =

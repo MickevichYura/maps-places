@@ -77,8 +77,6 @@ public class MainActivity extends AppCompatActivity {
     FloatingActionButton.OnClickListener fabOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Snackbar.make(view, "Add new place action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
             Intent intent = new Intent(getBaseContext(), NewPlaceActivity.class);
             startActivity(intent);
         }

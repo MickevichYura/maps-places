@@ -11,5 +11,7 @@
     <string name="edit_text_website_hint">http://site.com/</string>
     <string name="edit_text_phone_hint">80152123456</string>
     <string name="choose_coordinates_button">choose coordinates</string>
+    <string name="invalid_data">Invalid data</string>
+    <string name="gps_not_available">Google play service are not available</string>
 
 </resources>
