@@ -31,6 +31,17 @@
             android:label="@string/title_activity_place"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+
+        <activity
+            android:name=".Activity.NewPlaceActivity"
+            android:label="@string/title_activity_new_place"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
     </application>
 
 </manifest>

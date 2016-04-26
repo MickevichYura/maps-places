@@ -4,5 +4,12 @@
     <string name="action_place_picker">Choose place</string>
     <string name="google_app_id">google_app_id</string>
     <string name="title_activity_place">PlaceActivity</string>
+    <string name="title_activity_new_place">Add new place</string>
     <string name="photo_card_author">Author: %1$s</string>
+    <string name="edit_text_name_hint">Name</string>
+    <string name="edit_text_address_hint">Address</string>
+    <string name="edit_text_website_hint">http://site.com/</string>
+    <string name="edit_text_phone_hint">80152123456</string>
+    <string name="choose_coordinates_button">choose coordinates</string>
+
 </resources>

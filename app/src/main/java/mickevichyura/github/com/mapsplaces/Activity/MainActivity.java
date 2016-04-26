@@ -79,8 +79,11 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View view) {
             Snackbar.make(view, "Add new place action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
+            Intent intent = new Intent(getBaseContext(), NewPlaceActivity.class);
+            startActivity(intent);
         }
     };
+
 
     private void setAdapter() {
         mRecyclerView = (RecyclerView) findViewById(R.id.listPlaces);
