@@ -1,5 +1,7 @@
 package mickevichyura.github.com.mapsplaces;
 
+import com.google.android.gms.location.places.Place;
+
 import java.io.Serializable;
 
 public class PlaceObject implements Serializable {
@@ -52,7 +54,7 @@ public class PlaceObject implements Serializable {
 
     }
 
-    public PlaceObject(com.google.android.gms.location.places.Place place) {
+    public PlaceObject(Place place) {
         this.name = place.getName().toString();
         this.address = place.getAddress().toString();
         this.id = place.getId();

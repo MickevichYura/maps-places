@@ -11,20 +11,26 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlacePhotoMetadata;
 import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
 import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlacePicker;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import mickevichyura.github.com.mapsplaces.Adapter.PhotoCardRecyclerViewAdapter;
 import mickevichyura.github.com.mapsplaces.PhotoObject;
@@ -37,11 +43,11 @@ public class PlaceActivity extends AppCompatActivity {
 
     private GoogleApiClient mGoogleApiClient;
 
-    private PhotoCardRecyclerViewAdapter photoCardAdapter;
+    private PhotoCardRecyclerViewAdapter mPhotoCardAdapter;
 
     private List<Bitmap> mListPhotos;
     private List<String> mListPhotosAuthors;
-    private List<PhotoObject> photoObjectList;
+    private List<PhotoObject> mPhotoObjectList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +59,7 @@ public class PlaceActivity extends AppCompatActivity {
 
         mListPhotos = new ArrayList<>();
         mListPhotosAuthors = new ArrayList<>();
-        photoObjectList = new ArrayList<>();
+        mPhotoObjectList = new ArrayList<>();
         setAdapter();
 
         Intent intent = getIntent();
@@ -61,20 +67,19 @@ public class PlaceActivity extends AppCompatActivity {
         if (place != null) {
             toolbar.setTitle(place.getName());
         }
+
         setSupportActionBar(toolbar);
 
         setContent(place);
 
-        loadPlacePhotosAsync(place.getId());
+        if (mPhotoObjectList.isEmpty())
+            loadPlacePhotosAsync(place.getId());
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         if (fab != null) {
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Snackbar.make(view, "Edit place action", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-
                     Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + place.getName() + " " + place.getAddress());
                     Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                     mapIntent.setPackage("com.google.android.apps.maps");
@@ -91,14 +96,14 @@ public class PlaceActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(sGridLayoutManager);
 
-        photoCardAdapter = new PhotoCardRecyclerViewAdapter(getBaseContext(), photoObjectList);
-        recyclerView.setAdapter(photoCardAdapter);
+        mPhotoCardAdapter = new PhotoCardRecyclerViewAdapter(getBaseContext(), mPhotoObjectList);
+        recyclerView.setAdapter(mPhotoCardAdapter);
     }
 
     public void setContent(PlaceObject place) {
 
         TextView tv = (TextView) findViewById(R.id.tv_name);
-        tv.setText(place.toString());
+        tv.setText(place.getName());
 
         tv = (TextView) findViewById(R.id.tv_address);
         tv.setText(place.getAddress());
@@ -119,11 +124,11 @@ public class PlaceActivity extends AppCompatActivity {
             }
 
             mListPhotos.add(placePhotoResult.getBitmap());
-            if (mListPhotos.size() > 0){
-                photoObjectList.get(mListPhotos.size() - 1).setPhoto(placePhotoResult.getBitmap());
+            if (mListPhotos.size() > 0) {
+                mPhotoObjectList.get(mListPhotos.size() - 1).setPhoto(placePhotoResult.getBitmap());
             }
 
-            photoCardAdapter.notifyDataSetChanged();
+            mPhotoCardAdapter.notifyDataSetChanged();
         }
     };
 
@@ -142,23 +147,21 @@ public class PlaceActivity extends AppCompatActivity {
                             for (PlacePhotoMetadata placePhotoMetadata : photoMetadataBuffer) {
                                 author = String.format(getResources().getString(R.string.photo_card_author), Html.fromHtml(placePhotoMetadata.getAttributions().toString()).toString());
                                 mListPhotosAuthors.add(author);
-                                placePhotoMetadata.getScaledPhoto(mGoogleApiClient, 640, 640).setResultCallback(mDisplayPhotoResultCallback,
-                                        1000, TimeUnit.SECONDS);
+                                placePhotoMetadata.getScaledPhoto(mGoogleApiClient, 640, 640).setResultCallback(mDisplayPhotoResultCallback);
                             }
-                        } else {
-//                            mImageView.setImageResource(R.drawable.ic_plusone_small_off_client);
                         }
+
+                        for (String s : mListPhotosAuthors) {
+                            mPhotoObjectList.add(new PhotoObject(null, s));
+                        }
+                        mPhotoCardAdapter.notifyItemRangeInserted(0, mPhotoObjectList.size() - 1);
 
                         photoMetadataBuffer.release();
 
-                        for (String s : mListPhotosAuthors) {
-                            photoObjectList.add(new PhotoObject(null, s));
-                        }
-                        photoCardAdapter.notifyDataSetChanged();
                     }
-                }, 5, TimeUnit.MINUTES);
+                });
 
-        photoCardAdapter.notifyDataSetChanged();
+        mPhotoCardAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -182,12 +185,52 @@ public class PlaceActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_update) {
+            Intent intent = getIntent();
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            finish();
+            startActivity(intent);
+            return true;
+        }
+
+        if (id == R.id.action_place_picker) {
+            int PLACE_PICKER_REQUEST = 1;
+            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+            try {
+                startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+            } catch (GooglePlayServicesRepairableException e) {
+                e.printStackTrace();
+            } catch (GooglePlayServicesNotAvailableException e) {
+                e.printStackTrace();
+                Toast.makeText(PlaceActivity.this, "Google play service are not available", Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        }
+
+
+        return super.onOptionsItemSelected(item);
     }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(this, data);
+                PlaceObject placeObject = new PlaceObject(place);
+                Intent intent = new Intent(getBaseContext(), PlaceActivity.class);
+
+                intent.putExtra("place", placeObject);
+                startActivity(intent);
+            }
+        }
+    }
+
 }

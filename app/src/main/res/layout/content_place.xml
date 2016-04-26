@@ -10,12 +10,14 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".Activity.PlaceActivity"
-    tools:showIn="@layout/activity_place">
+    tools:showIn="@layout/activity_place"
+    android:background="@color/cardBackgroundColor">
 
     <TextView
         android:id="@+id/tv_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="20sp"
         android:padding="3dp" />
 
     <TextView
@@ -23,6 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_name"
+        android:textSize="20sp"
         android:padding="3dp" />
 
     <TextView
@@ -30,6 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_address"
+        android:textSize="20sp"
         android:padding="3dp" />
 
     <TextView
@@ -37,6 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_website_uri"
+        android:textSize="20sp"
         android:padding="3dp" />
 
     <android.support.v7.widget.RecyclerView

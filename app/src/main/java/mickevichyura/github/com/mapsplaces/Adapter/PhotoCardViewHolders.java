@@ -25,8 +25,8 @@ public class PhotoCardViewHolders extends RecyclerView.ViewHolder implements
     @Override
     public void onClick(View view)
     {
-        Toast.makeText(view.getContext(),
-                "Clicked Position = " + view.getId(), Toast.LENGTH_SHORT)
-                .show();
+//        Toast.makeText(view.getContext(),
+//                "Clicked Position = " + view.getId(), Toast.LENGTH_SHORT)
+//                .show();
     }
 }
