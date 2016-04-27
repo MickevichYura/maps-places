@@ -1,20 +1,19 @@
-package mickevichyura.github.com.mapsplaces.Adapter;
+package mickevichyura.github.com.mapsplaces.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import mickevichyura.github.com.mapsplaces.R;
 
-public class PhotoCardViewHolders extends RecyclerView.ViewHolder implements
+public class PhotoCardViewHolder extends RecyclerView.ViewHolder implements
         View.OnClickListener
 {
     public ImageView mPhotoImageView;
     public TextView mAuthorTextView;
 
-    public PhotoCardViewHolders(View itemView)
+    public PhotoCardViewHolder(View itemView)
     {
         super(itemView);
         itemView.setOnClickListener(this);

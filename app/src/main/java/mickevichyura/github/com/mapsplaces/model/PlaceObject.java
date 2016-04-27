@@ -1,4 +1,4 @@
-package mickevichyura.github.com.mapsplaces;
+package mickevichyura.github.com.mapsplaces.model;
 
 import com.google.android.gms.location.places.Place;
 

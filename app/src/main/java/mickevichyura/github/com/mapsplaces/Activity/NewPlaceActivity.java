@@ -1,4 +1,4 @@
-package mickevichyura.github.com.mapsplaces.Activity;
+package mickevichyura.github.com.mapsplaces.activity;
 
 
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package mickevichyura.github.com.mapsplaces;
+package mickevichyura.github.com.mapsplaces.model;
 
 import android.graphics.Bitmap;
 

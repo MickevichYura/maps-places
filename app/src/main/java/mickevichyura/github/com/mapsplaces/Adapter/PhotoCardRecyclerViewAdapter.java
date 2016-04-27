@@ -1,4 +1,4 @@
-package mickevichyura.github.com.mapsplaces.Adapter;
+package mickevichyura.github.com.mapsplaces.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -8,10 +8,10 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-import mickevichyura.github.com.mapsplaces.PhotoObject;
+import mickevichyura.github.com.mapsplaces.model.PhotoObject;
 import mickevichyura.github.com.mapsplaces.R;
 
-public class PhotoCardRecyclerViewAdapter extends RecyclerView.Adapter<PhotoCardViewHolders>
+public class PhotoCardRecyclerViewAdapter extends RecyclerView.Adapter<PhotoCardViewHolder>
 {
     private List<PhotoObject> photoList;
     private Context context;
@@ -24,16 +24,16 @@ public class PhotoCardRecyclerViewAdapter extends RecyclerView.Adapter<PhotoCard
     }
 
     @Override
-    public PhotoCardViewHolders onCreateViewHolder(ViewGroup parent, int viewType)
+    public PhotoCardViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
         View layoutView = LayoutInflater.from(parent.getContext()).inflate(
                 R.layout.photo_card_item, null);
-        PhotoCardViewHolders rcv = new PhotoCardViewHolders(layoutView);
+        PhotoCardViewHolder rcv = new PhotoCardViewHolder(layoutView);
         return rcv;
     }
 
     @Override
-    public void onBindViewHolder(PhotoCardViewHolders holder, int position)
+    public void onBindViewHolder(PhotoCardViewHolder holder, int position)
     {
         holder.mPhotoImageView.setImageBitmap(photoList.get(position).getPhoto());
         holder.mAuthorTextView.setText(photoList.get(position).getAuthor());

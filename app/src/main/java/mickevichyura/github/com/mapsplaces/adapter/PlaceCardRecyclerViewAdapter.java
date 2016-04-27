@@ -1,4 +1,4 @@
-package mickevichyura.github.com.mapsplaces.Adapter;
+package mickevichyura.github.com.mapsplaces.adapter;
 
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -10,10 +10,10 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import mickevichyura.github.com.mapsplaces.PlaceObject;
+import mickevichyura.github.com.mapsplaces.model.PlaceObject;
 import mickevichyura.github.com.mapsplaces.R;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.PlaceViewHolder> {
+public class PlaceCardRecyclerViewAdapter extends RecyclerView.Adapter<PlaceCardRecyclerViewAdapter.PlaceViewHolder> {
 
     public static class PlaceViewHolder extends RecyclerView.ViewHolder {
         CardView cv;
@@ -46,12 +46,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private OnItemClickListener listener;
 
-    public RecyclerViewAdapter(List<PlaceObject> places, OnItemClickListener listener) {
+    public PlaceCardRecyclerViewAdapter(List<PlaceObject> places, OnItemClickListener listener) {
         this.places = places;
         this.listener = listener;
     }
 
-    public RecyclerViewAdapter(List<PlaceObject> places) {
+    public PlaceCardRecyclerViewAdapter(List<PlaceObject> places) {
         this.places = places;
     }
 

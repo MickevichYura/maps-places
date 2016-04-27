@@ -1,11 +1,10 @@
-package mickevichyura.github.com.mapsplaces.Activity;
+package mickevichyura.github.com.mapsplaces.activity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -32,9 +31,9 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import java.util.ArrayList;
 import java.util.List;
 
-import mickevichyura.github.com.mapsplaces.Adapter.PhotoCardRecyclerViewAdapter;
-import mickevichyura.github.com.mapsplaces.PhotoObject;
-import mickevichyura.github.com.mapsplaces.PlaceObject;
+import mickevichyura.github.com.mapsplaces.adapter.PhotoCardRecyclerViewAdapter;
+import mickevichyura.github.com.mapsplaces.model.PhotoObject;
+import mickevichyura.github.com.mapsplaces.model.PlaceObject;
 import mickevichyura.github.com.mapsplaces.R;
 
 public class PlaceActivity extends AppCompatActivity {
